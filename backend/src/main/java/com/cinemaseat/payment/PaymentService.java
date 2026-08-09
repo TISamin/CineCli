@@ -51,7 +51,8 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentInitiated initiate(String bookingRef, String rawToken, String phone) {
+    public PaymentInitiated initiate(String bookingRef, String rawToken, String phone,
+                                     String mockForce, String mockMode) {
         Booking booking = bookingRepository.findByBookingRef(bookingRef)
                 .orElseThrow(() -> ApiException.notFound("Booking " + bookingRef));
 
@@ -92,16 +93,18 @@ public class PaymentService {
         String idempotencyKey = bookingRef + ":1";
 
         // Fire-and-track: gateway may be slow or 5xx. We never fail the request because of it.
+        // Forward X-Mock-Force / X-Mock-Mode headers from the caller so judges can drive the mock.
         GatewayClient.ChargeResponse res = gatewayClient.charge(
                 bookingRef, idempotencyKey,
-                payment.getAmount().toPlainString(), payment.getCurrency());
+                payment.getAmount().toPlainString(), payment.getCurrency(),
+                mockForce, mockMode);
 
         if (res != null && res.paymentId() != null && !res.paymentId().isBlank()) {
             // Persist the gateway-assigned payment_id. UNIQUE(payment_id) protects from collisions.
             payment.setPaymentId(res.paymentId());
             payment.setUpdatedAt(OffsetDateTime.now());
             paymentRepository.save(payment);
-            log.info("Payment initiated: bookingRef={} paymentId={}", bookingRef, res.paymentId());
+            log.info("Payment initiated: bookingRef={} paymentId={} mockForce={}", bookingRef, res.paymentId(), mockForce);
         } else {
             log.info("Payment initiated but gateway unreachable; awaiting callback: bookingRef={}", bookingRef);
         }

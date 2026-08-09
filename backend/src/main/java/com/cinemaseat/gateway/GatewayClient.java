@@ -37,20 +37,29 @@ public class GatewayClient {
 
     /**
      * POST /charge with Idempotency-Key. Returns the parsed response, or null on transport/5xx.
+     *
+     * @param mockForce optional X-Mock-Force header (success|fail|duplicate|timeout|race)
+     * @param mockMode  optional X-Mock-Mode header (deterministic)
      */
     public ChargeResponse charge(String bookingRef, String idempotencyKey,
-                                 String amount, String currency) {
+                                 String amount, String currency,
+                                 String mockForce, String mockMode) {
         String body = """
                 {"amount":%s,"currency":"%s","booking_ref":"%s","callback_url":"%s"}
                 """.formatted(amount, currency, bookingRef, properties.getGateway().getCallbackUrl());
 
-        HttpRequest req = HttpRequest.newBuilder()
+        HttpRequest.Builder b = HttpRequest.newBuilder()
                 .uri(URI.create(properties.getGateway().getUrl() + "/charge"))
                 .timeout(Duration.ofMillis(properties.getGateway().getRequestTimeoutMs()))
                 .header("Content-Type", "application/json")
-                .header("Idempotency-Key", idempotencyKey)
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
+                .header("Idempotency-Key", idempotencyKey);
+        if (mockForce != null && !mockForce.isBlank()) {
+            b.header("X-Mock-Force", mockForce);
+        }
+        if (mockMode != null && !mockMode.isBlank()) {
+            b.header("X-Mock-Mode", mockMode);
+        }
+        HttpRequest req = b.POST(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -65,14 +74,15 @@ public class GatewayClient {
         }
     }
 
-    public boolean refund(String paymentId) {
+    public boolean refund(String paymentId, String mockForce, String mockMode) {
         String body = "{\"payment_id\":\"" + paymentId + "\"}";
-        HttpRequest req = HttpRequest.newBuilder()
+        HttpRequest.Builder b = HttpRequest.newBuilder()
                 .uri(URI.create(properties.getGateway().getUrl() + "/refund"))
                 .timeout(Duration.ofMillis(properties.getGateway().getRequestTimeoutMs()))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
+                .header("Content-Type", "application/json");
+        if (mockForce != null && !mockForce.isBlank()) b.header("X-Mock-Force", mockForce);
+        if (mockMode != null && !mockMode.isBlank()) b.header("X-Mock-Mode", mockMode);
+        HttpRequest req = b.POST(HttpRequest.BodyPublishers.ofString(body)).build();
         try {
             HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
             return res.statusCode() / 100 == 2;

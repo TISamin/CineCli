@@ -205,11 +205,11 @@ public class CallbackService {
     /**
      * Trigger an outbound refund via the gateway (addendum B6).
      */
-    public boolean requestRefund(String bookingRef) {
+    public boolean requestRefund(String bookingRef, String mockForce, String mockMode) {
         Booking booking = bookingRepository.findByBookingRef(bookingRef).orElse(null);
         if (booking == null || booking.getStatus() != Booking.Status.CONFIRMED) return false;
         Payment payment = paymentRepository.findByBookingId(booking.getId()).orElse(null);
         if (payment == null || !"SUCCEEDED".equals(payment.getStatus().name())) return false;
-        return gatewayClient.refund(payment.getPaymentId());
+        return gatewayClient.refund(payment.getPaymentId(), mockForce, mockMode);
     }
 }
