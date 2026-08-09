@@ -1,0 +1,89 @@
+# Render Blueprint — CinemaSeat
+# One-click deploy for the backend (Spring Boot) + Postgres + the mock gateway.
+#
+# How to use:
+#   1. Push this repo to GitHub (already done).
+#   2. Sign in to https://render.com with GitHub.
+#   3. Click "New" → "Blueprint" → select this repo.
+#   4. Render will see this file and create all three services.
+#   5. After the gateway service is up, copy its public URL
+#      (https://cinecli-gateway.onrender.com) and set it as
+#      GATEWAY_URL on the api service. Then the api will be reachable
+#      at https://cinecli-api.onrender.com.
+#
+# Note: Render's free tier Postgres expires after 90 days. The free
+# web service sleeps after 15 min of inactivity. For a prod-grade demo,
+# use the Starter tier ($7/mo Postgres + $7/mo Web Service).
+
+services:
+  # ----- PostgreSQL -----
+  - type: pserv
+    name: cinecli-db
+    plan: free                # 90-day free tier; upgrade to starter for persistent
+    region: oregon
+    postgresVersion: "16"
+    envVars:
+      - key: POSTGRES_DB
+        value: cinemaseat
+      - key: POSTGRES_USER
+        value: cinemaseat
+      - key: POSTGRES_PASSWORD
+        generateValue: true   # Render generates a strong password
+
+  # ----- Mock gateway -----
+  - type: web
+    name: cinecli-gateway
+    plan: free
+    region: oregon
+    runtime: docker
+    image:
+      url: asifmahmoud414/mock-gateway:latest
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "9000"
+      - key: MIN_DELAY_MS
+        value: "2000"
+      - key: MAX_DELAY_MS
+        value: "15000"
+      - key: FAILURE_RATE
+        value: "0.1"
+      - key: DUPLICATE_RATE
+        value: "0.08"
+      - key: MAX_CALLBACK_ATTEMPTS
+        value: "8"
+
+  # ----- Spring Boot API -----
+  - type: web
+    name: cinecli-api
+    plan: free
+    region: oregon
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    autoDeploy: true
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromService: { type: pserv, name: cinecli-db, property: connectionString }
+      - key: SPRING_DATASOURCE_USERNAME
+        fromService: { type: pserv, name: cinecli-db, property: username }
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromService: { type: pserv, name: cinecli-db, property: password }
+      # The gateway runs as a sibling service; use its Render URL.
+      # After the gateway deploys, set this to https://cinecli-gateway.onrender.com
+      - key: GATEWAY_URL
+        value: https://cinecli-gateway.onrender.com
+      # The callback URL must be reachable from the gateway. Since
+      # both run on Render, use the api's public URL.
+      - key: GATEWAY_CALLBACK_URL
+        value: https://cinecli-api.onrender.com/api/payments/callback
+      - key: OTP_CALLBACK_URL
+        value: https://cinecli-api.onrender.com/api/otp/callback
+      - key: GATEWAY_SECRET
+        value: z2p-2026-secret
+      - key: HOLD_TTL_SECONDS
+        value: "120"
+      - key: JAVA_OPTS
+        value: "-XX:+UseG1GC -XX:MaxRAMPercentage=75"

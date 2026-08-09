@@ -46,7 +46,6 @@ The frontend (`backend/src/main/resources/static/`) is served by Spring Boot at 
 ```bash
 git clone https://github.com/TISamin/CineCli.git
 cd CineCli
-cp .env.example .env
 docker compose up --build
 ```
 
@@ -56,6 +55,10 @@ When `Started CinemaSeatApplication` appears, verify:
 curl http://localhost:8080/health
 # {"status":"UP"}
 ```
+
+The static frontend lives in two places: bundled inside the Spring Boot jar
+(`backend/src/main/resources/static/`) for local + Render deploys, and extracted
+to `frontend/` for Vercel deploys. Both are kept in sync.
 
 ## API documentation
 
@@ -158,9 +161,10 @@ k6 run -e BASE_URL=http://localhost:8080 -e HOLD_TTL_SECONDS=10 -e WAIT_SECONDS=
 
 ## Deployment
 
-Deployed to Poridhi VM (TBD URL). The compose file is also production-ready: point
-`GATEWAY_CALLBACK_URL` and `GATEWAY_SECRET` at the production values via environment
-overrides.
+See **[DEPLOY.md](DEPLOY.md)** for one-click deploy to Render + Vercel.
+
+The compose file is also production-ready: point `GATEWAY_CALLBACK_URL` and
+`GATEWAY_SECRET` at the production values via environment overrides.
 
 ## Known limitations
 

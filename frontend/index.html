@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CinemaSeat — Now Showing</title>
+    <link rel="stylesheet" href="/style.css" />
+    <!-- API base URL. Defaults to same-origin; override via window.__API_BASE__ for cross-origin deployments. -->
+    <script>window.__API_BASE__ = window.__API_BASE__ || '';</script>
+</head>
+<body data-page="movies">
+    <header>
+        <h1>CinemaSeat</h1>
+        <span class="badge">Booking</span>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Now Showing</h2>
+            <p class="muted">Pick a movie to see available showtimes.</p>
+        </section>
+
+        <div id="movies" class="grid">Loading…</div>
+
+        <div id="toast" class="toast" hidden></div>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>
