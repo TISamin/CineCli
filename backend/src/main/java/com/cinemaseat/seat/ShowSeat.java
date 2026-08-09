@@ -38,9 +38,6 @@ public class ShowSeat {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @Column(name = "seat_code", insertable = false, updatable = false)
-    private String seatCode;
-
     public Long getId() { return id; }
     public Long getShowId() { return showId; }
     public Long getSeatId() { return seatId; }
@@ -49,7 +46,6 @@ public class ShowSeat {
     public OffsetDateTime getHoldExpiresAt() { return holdExpiresAt; }
     public Long getBookingId() { return bookingId; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
-    public String getSeatCode() { return seatCode; }
 
     public void setStatus(Status status) { this.status = status; }
     public void setHoldExpiresAt(OffsetDateTime t) { this.holdExpiresAt = t; }
