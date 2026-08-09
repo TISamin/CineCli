@@ -91,11 +91,6 @@ jobs:
       gateway:
         image: asifmahmoud414/mock-gateway:latest
         ports: ["9000:9000"]
-        options: >-
-          --health-cmd "curl -fsS http://localhost:9000/health || exit 1"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -197,5 +192,5 @@ jobs:
           context: ./backend
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/cinemaseat:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=publish
+          cache-to: type=gha,mode=max,scope=publish
