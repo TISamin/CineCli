@@ -49,5 +49,12 @@ public class Payment {
     public void setAmount(BigDecimal a) { this.amount = a; }
     public void setCurrency(String c) { this.currency = c; }
     public void setStatus(Status s) { this.status = s; }
+    public void setCreatedAt(OffsetDateTime t) { this.createdAt = t; }
     public void setUpdatedAt(OffsetDateTime t) { this.updatedAt = t; }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) createdAt = OffsetDateTime.now();
+        if (updatedAt == null) updatedAt = createdAt;
+    }
 }

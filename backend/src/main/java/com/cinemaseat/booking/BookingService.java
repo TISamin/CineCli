@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
-import java.util.HexFormat;
 import java.util.UUID;
 
 /**
@@ -99,7 +98,7 @@ public class BookingService {
             throw ApiException.conflict("Seat is already booked");
         }
 
-        // 4. Create the booking.
+        // 4. Create the booking. booking_ref is a UUID; collision probability is negligible.
         Booking booking = new Booking();
         booking.setBookingRef(generateBookingRef());
         booking.setShowId(showId);
@@ -150,10 +149,8 @@ public class BookingService {
     }
 
     public static String generateBookingRef() {
-        byte[] b = new byte[4];
-        RNG.nextBytes(b);
-        String hex = HexFormat.of().formatHex(b).toUpperCase();
-        return "BK-" + java.time.LocalDate.now() + "-" + hex;
+        // UUID-based: collision-resistant even at 10^9 concurrent holds; no retry needed.
+        return "BK-" + UUID.randomUUID().toString();
     }
 
     public record HoldResult(String bookingRef, String holdToken, OffsetDateTime expiresAt,

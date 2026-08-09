@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -30,10 +31,11 @@ public class HoldCleanupJob {
     @Scheduled(fixedDelayString = "${cinemaseat.hold.cleanup-interval-ms:10000}")
     @Transactional
     public void releaseExpiredHolds() {
-        OffsetDateTime now = OffsetDateTime.now();
-        List<ShowSeat> expired = showSeatRepository.findExpiredForCleanup(now);
+        Instant nowInstant = Instant.now();
+        List<ShowSeat> expired = showSeatRepository.findExpiredForCleanup(nowInstant);
         if (expired.isEmpty()) return;
 
+        OffsetDateTime now = OffsetDateTime.now();
         for (ShowSeat ss : expired) {
             log.info("Releasing expired hold: showSeatId={} bookingId={}", ss.getId(), ss.getBookingId());
             ss.setStatus(ShowSeat.Status.AVAILABLE);

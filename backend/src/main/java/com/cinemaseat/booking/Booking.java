@@ -49,5 +49,12 @@ public class Booking {
     public void setUserPhone(String p) { this.userPhone = p; }
     public void setTotalAmount(BigDecimal a) { this.totalAmount = a; }
     public void setStatus(Status s) { this.status = s; }
+    public void setCreatedAt(OffsetDateTime t) { this.createdAt = t; }
     public void setUpdatedAt(OffsetDateTime t) { this.updatedAt = t; }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) createdAt = OffsetDateTime.now();
+        if (updatedAt == null) updatedAt = createdAt;
+    }
 }
