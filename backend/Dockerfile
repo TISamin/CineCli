@@ -1,12 +1,15 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /workspace
+RUN apk add --no-cache maven
 COPY pom.xml ./
+RUN mvn -B -q dependency:go-offline || true
 COPY src src
-RUN apk add --no-cache maven && mvn -B -q -DskipTests package
+RUN mvn -B -DskipTests package
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-RUN addgroup -S app && adduser -S app -G app
+RUN apk add --no-cache curl \
+ && addgroup -S app && adduser -S app -G app
 COPY --from=build /workspace/target/cinemaseat-backend-*.jar /app/app.jar
 USER app
 EXPOSE 8080
