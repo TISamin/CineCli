@@ -71,7 +71,7 @@ jobs:
 
   # ----- 2. End-to-end stack + Scenario A keystone via k6 -----
   keystone:
-    name: Keystone (Scenario A: 1/99/0)
+    name: "Keystone (Scenario A: 1/99/0)"
     runs-on: ubuntu-latest
     needs: test
     services:
@@ -91,7 +91,11 @@ jobs:
       gateway:
         image: asifmahmoud414/mock-gateway:latest
         ports: ["9000:9000"]
-        options: --health-cmd "curl -fsS http://localhost:9000/health" --health-interval 5s --health-timeout 5s --health-retries 10
+        options: >-
+          --health-cmd "curl -fsS http://localhost:9000/health || exit 1"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
