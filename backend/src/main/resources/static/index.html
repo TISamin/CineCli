@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CinemaStar — Movies</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <header>
+        <h1>CinemaStar</h1>
+        <span class="badge">CinemaSeat</span>
+    </header>
+
+    <main>
+        <h2>Now Showing</h2>
+        <div id="movies" class="grid">Loading…</div>
+    </main>
+
+    <script src="/app.js"></script>
+    <script>window.CinemaStar.loadMovies();</script>
+</body>
+</html>

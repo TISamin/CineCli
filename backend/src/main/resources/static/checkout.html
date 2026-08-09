@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <header><h1>Checkout</h1></header>
+    <main>
+        <div id="summary">Loading…</div>
+        <label>Phone: <input id="phone" placeholder="017XXXXXXXX" /></label>
+        <button id="pay-btn">Pay now</button>
+        <pre id="pay-result"></pre>
+    </main>
+
+    <script src="/app.js"></script>
+    <script>window.CinemaStar.loadCheckoutPage();</script>
+</body>
+</html>

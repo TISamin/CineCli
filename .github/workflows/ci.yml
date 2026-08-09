@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: cinemaseat
+          POSTGRES_USER: cinemaseat
+          POSTGRES_PASSWORD: cinemaseat
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cinemaseat"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-
+
+      - name: Run tests
+        working-directory: backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/cinemaseat
+          SPRING_DATASOURCE_USERNAME: cinemaseat
+          SPRING_DATASOURCE_PASSWORD: cinemaseat
+        run: mvn -B test
+
+      - name: Build jar
+        working-directory: backend
+        run: mvn -B -DskipTests package
+
+      - name: Build Docker image
+        run: docker build -t cinemaseat:test ./backend

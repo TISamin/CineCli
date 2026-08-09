@@ -1,0 +1,63 @@
+# docker-compose.yml -- CinemaSeat (addendum B2: service name MUST be 'api' so the gateway
+# reference's example URL http://api:3000/webhooks/payment works out of the box).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cinemaseat-postgres
+    environment:
+      POSTGRES_DB: cinemaseat
+      POSTGRES_USER: cinemaseat
+      POSTGRES_PASSWORD: cinemaseat
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cinemaseat -d cinemaseat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  gateway:
+    image: asifmahmoud414/mock-gateway:latest
+    container_name: cinemaseat-gateway
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cinemaseat-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cinemaseat
+      SPRING_DATASOURCE_USERNAME: cinemaseat
+      SPRING_DATASOURCE_PASSWORD: cinemaseat
+      GATEWAY_URL: http://gateway:9000
+      # Addendum B1: callback URL MUST be reachable from the gateway container.
+      GATEWAY_CALLBACK_URL: http://api:8080/api/payments/callback
+      OTP_CALLBACK_URL: http://api:8080/api/otp/callback
+      GATEWAY_SECRET: z2p-2026-secret
+      HOLD_TTL_SECONDS: "120"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:

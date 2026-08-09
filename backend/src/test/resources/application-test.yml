@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: cinemaseat-test
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      connection-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    time-zone: UTC
+
+cinemaseat:
+  hold:
+    ttl-seconds: 120
+    cleanup-interval-ms: 600000
+  gateway:
+    url: http://localhost:9999
+    callback-url: http://localhost:8080/api/payments/callback
+    secret: test-secret
+  otp:
+    callback-url: http://localhost:8080/api/otp/callback
+    max-verify-attempts: 5
+
+logging:
+  level:
+    com.cinemaseat: INFO
+    org.hibernate: WARN

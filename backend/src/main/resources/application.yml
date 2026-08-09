@@ -1,0 +1,61 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: cinemaseat
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/cinemaseat}
+    username: ${SPRING_DATASOURCE_USERNAME:cinemaseat}
+    password: ${SPRING_DATASOURCE_PASSWORD:cinemaseat}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:30}
+      minimum-idle: 5
+      connection-timeout: 3000
+      pool-name: CinemaSeatPool
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+# App config
+cinemaseat:
+  hold:
+    ttl-seconds: ${HOLD_TTL_SECONDS:120}
+    cleanup-interval-ms: ${HOLD_CLEANUP_INTERVAL_MS:10000}
+  gateway:
+    url: ${GATEWAY_URL:http://gateway:9000}
+    callback-url: ${GATEWAY_CALLBACK_URL:http://api:8080/api/payments/callback}
+    secret: ${GATEWAY_SECRET:z2p-2026-secret}
+    request-timeout-ms: ${GATEWAY_REQUEST_TIMEOUT_MS:10000}
+  otp:
+    callback-url: ${OTP_CALLBACK_URL:http://api:8080/api/otp/callback}
+    max-verify-attempts: ${OTP_MAX_VERIFY_ATTEMPTS:5}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.cinemaseat: DEBUG
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} requestId=%X{requestId:-} - %msg%n"

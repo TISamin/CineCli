@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pick a Seat</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <header>
+        <h1>Pick Your Seat</h1>
+        <a class="back" href="/">← Movies</a>
+    </header>
+
+    <main>
+        <div id="show-info"></div>
+        <div class="screen">SCREEN</div>
+        <div id="seats" class="seat-grid">Loading…</div>
+        <div class="legend">
+            <span class="dot dot-available"></span>Available
+            <span class="dot dot-held"></span>Held
+            <span class="dot dot-booked"></span>Booked
+        </div>
+        <div id="checkout" hidden>
+            <h3>Hold this seat</h3>
+            <label>Phone: <input id="phone" placeholder="017XXXXXXXX" /></label>
+            <button id="hold-btn">Hold seat</button>
+            <pre id="hold-result"></pre>
+        </div>
+    </main>
+
+    <script src="/app.js"></script>
+    <script>window.CinemaStar.loadSeatsPage();</script>
+</body>
+</html>
