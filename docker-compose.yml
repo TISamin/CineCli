@@ -22,7 +22,11 @@ services:
     ports:
       - "9000:9000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      # The mock-gateway image (Node) has no curl/wget. Use a node one-liner
+      # to do a TCP probe on port 9000. If the port is open, exit 0.
+      test:
+        - CMD-SHELL
+        - node -e "require('net').connect(9000,'127.0.0.1',()=>process.exit(0)).on('error',()=>process.exit(1))"
       interval: 5s
       timeout: 5s
       retries: 10

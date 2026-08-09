@@ -27,3 +27,6 @@ Thumbs.db
 
 # Maven
 .mvn/wrapper/maven-wrapper.jar
+
+# Load test runner copied locally to a no-spaces path on Windows
+tests/load/bin/
