@@ -3,7 +3,6 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cinemaseat-postgres
     environment:
       POSTGRES_DB: cinemaseat
       POSTGRES_USER: cinemaseat
@@ -20,7 +19,6 @@ services:
 
   gateway:
     image: asifmahmoud414/mock-gateway:latest
-    container_name: cinemaseat-gateway
     ports:
       - "9000:9000"
     healthcheck:
@@ -34,7 +32,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: cinemaseat-api
     depends_on:
       postgres:
         condition: service_healthy
