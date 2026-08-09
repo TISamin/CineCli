@@ -2,6 +2,8 @@ package com.cinemaseat.movie;
 
 import com.cinemaseat.common.ApiException;
 import com.cinemaseat.show.Show;
+import com.cinemaseat.show.ShowDetail;
+import com.cinemaseat.show.ShowEnrichmentService;
 import com.cinemaseat.show.ShowRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,10 +18,14 @@ public class MovieController {
 
     private final MovieRepository movieRepository;
     private final ShowRepository showRepository;
+    private final ShowEnrichmentService enrichment;
 
-    public MovieController(MovieRepository movieRepository, ShowRepository showRepository) {
+    public MovieController(MovieRepository movieRepository,
+                           ShowRepository showRepository,
+                           ShowEnrichmentService enrichment) {
         this.movieRepository = movieRepository;
         this.showRepository = showRepository;
+        this.enrichment = enrichment;
     }
 
     @GetMapping
@@ -28,10 +34,11 @@ public class MovieController {
     }
 
     @GetMapping("/{movieId}/shows")
-    public List<Show> showsOf(@PathVariable Long movieId) {
+    public List<ShowDetail> showsOf(@PathVariable Long movieId) {
         if (!movieRepository.existsById(movieId)) {
             throw ApiException.notFound("Movie " + movieId);
         }
-        return showRepository.findByMovieIdOrderByStartTimeAsc(movieId);
+        List<Show> shows = showRepository.findByMovieIdOrderByStartTimeAsc(movieId);
+        return enrichment.enrichAll(shows);
     }
 }

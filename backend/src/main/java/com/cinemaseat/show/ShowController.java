@@ -11,13 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ShowController {
 
     private final ShowRepository showRepository;
+    private final ShowEnrichmentService enrichment;
 
-    public ShowController(ShowRepository showRepository) {
+    public ShowController(ShowRepository showRepository, ShowEnrichmentService enrichment) {
         this.showRepository = showRepository;
+        this.enrichment = enrichment;
     }
 
     @GetMapping("/{showId}")
-    public Show get(@PathVariable Long showId) {
-        return showRepository.findById(showId).orElseThrow(() -> ApiException.notFound("Show " + showId));
+    public ShowDetail get(@PathVariable Long showId) {
+        Show show = showRepository.findById(showId)
+                .orElseThrow(() -> ApiException.notFound("Show " + showId));
+        return enrichment.enrich(show);
     }
 }

@@ -3,33 +3,42 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pick a Seat</title>
+    <title>Pick a Seat — CinemaSeat</title>
     <link rel="stylesheet" href="/style.css" />
 </head>
-<body>
+<body data-page="seats">
     <header>
-        <h1>Pick Your Seat</h1>
+        <h1>CinemaSeat</h1>
         <a class="back" href="/">← Movies</a>
     </header>
 
     <main>
-        <div id="show-info"></div>
+        <div id="show-meta" class="show-meta">Loading show…</div>
+
         <div class="screen">SCREEN</div>
-        <div id="seats" class="seat-grid">Loading…</div>
+
+        <div id="seats" class="loading">Loading seats…</div>
+
         <div class="legend">
-            <span class="dot dot-available"></span>Available
-            <span class="dot dot-held"></span>Held
-            <span class="dot dot-booked"></span>Booked
+            <span><span class="dot dot-available"></span>Available</span>
+            <span><span class="dot dot-held"></span>Held</span>
+            <span><span class="dot dot-booked"></span>Booked</span>
+            <span><span class="dot dot-selected"></span>Selected</span>
         </div>
-        <div id="checkout" hidden>
-            <h3>Hold this seat</h3>
-            <label>Phone: <input id="phone" placeholder="017XXXXXXXX" /></label>
-            <button id="hold-btn">Hold seat</button>
-            <pre id="hold-result"></pre>
+
+        <div class="summary-bar">
+            <div class="info" id="summary-info">
+                <div class="empty">Select up to 6 seats to continue</div>
+            </div>
+            <label style="margin: 0; flex: 0 0 200px;">
+                <span>Phone</span>
+                <input type="tel" id="phone" placeholder="017XXXXXXXX" />
+            </label>
+            <button id="hold-btn" disabled>Hold seats</button>
         </div>
     </main>
 
+    <div id="toast" class="toast" hidden></div>
     <script src="/app.js"></script>
-    <script>window.CinemaStar.loadSeatsPage();</script>
 </body>
 </html>

@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout</title>
+    <title>Checkout — CinemaSeat</title>
     <link rel="stylesheet" href="/style.css" />
 </head>
-<body>
-    <header><h1>Checkout</h1></header>
+<body data-page="checkout">
+    <header>
+        <h1>CinemaSeat</h1>
+        <a class="back" href="/">← Movies</a>
+    </header>
+
     <main>
-        <div id="summary">Loading…</div>
-        <label>Phone: <input id="phone" placeholder="017XXXXXXXX" /></label>
-        <button id="pay-btn">Pay now</button>
-        <pre id="pay-result"></pre>
+        <div id="checkout-card" class="checkout-card">
+            <h2>Review &amp; Pay</h2>
+            <p class="muted">Loading…</p>
+        </div>
+        <div id="pay-status"></div>
     </main>
 
+    <div id="toast" class="toast" hidden></div>
     <script src="/app.js"></script>
-    <script>window.CinemaStar.loadCheckoutPage();</script>
 </body>
 </html>
